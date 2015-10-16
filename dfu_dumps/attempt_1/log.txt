@@ -1,0 +1,95 @@
+
+[pat@young-flyer:~]% dfu-util --list
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+Deducing device DFU version from functional descriptor length
+Found Runtime: [05ac:8289] ver=0112, devnum=6, cfg=1, intf=3, alt=0, name="UNKNOWN", serial="UNKNOWN"
+Found DFU: [0483:df11] ver=0200, devnum=18, cfg=1, intf=0, alt=1, name="@SPI Flash Memory /0x00000000/16*064Kg", serial="00000000010C"
+Found DFU: [0483:df11] ver=0200, devnum=18, cfg=1, intf=0, alt=0, name="@Internal Flash   /0x08000000/03*016Kg", serial="00000000010C"
+[pat@young-flyer:~]% dfu-util --device 0483:df11 --alt 0 -U md380dump_internal
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+Deducing device DFU version from functional descriptor length
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #0 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 1024
+Limiting default upload to 16384 bytes
+Upload  [=========================] 100%        16384 bytes
+Upload done.
+[pat@young-flyer:~]% dfu-util --device 0483:df11 --alt 1 -U md380dump_external
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+Deducing device DFU version from functional descriptor length
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #1 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 1024
+Limiting default upload to 16384 bytes
+Upload  [=========================] 100%        16384 bytes
+Upload done.
+[pat@young-flyer:~]% dfu-util --device 0483:df11 --alt 0 --upload-size 131072 -U md380dump_internal
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+Deducing device DFU version from functional descriptor length
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #0 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 1024
+dfu-util: Cannot open file md380dump_internal for writing: File exists
+[pat@young-flyer:~]% dfu-util --device 0483:df11 --alt 0 --upload-size 131072 -U md380dump_internal_2
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+Deducing device DFU version from functional descriptor length
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #0 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 1024
+Limiting default upload to 16384 bytes
+Upload  [=========================] 100%        16384 bytes
+Upload done.
