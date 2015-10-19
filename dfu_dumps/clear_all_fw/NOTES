@@ -1,0 +1,58 @@
+You can nuke all of TYTs firmware off the STM32 using dfu-util's dfuse
+extensions. WARNING: this renders your radio totally bricked at the moment!
+
+(travis goodspeed is working on a way to get a TYT bootloader image so we can
+write it back onto the STM32 to unbrick a device.)
+
+```
+dfu-util --device 0483:df11 --alt 0 --dfuse-address 0:force:mass-erase:unprotect
+--download flash
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+dfu-util: File too short for DFU suffix
+dfu-util: A valid DFU suffix will be required in a future dfu-util release!!!
+Deducing device DFU version from functional descriptor length
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #0 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 2048
+DfuSe interface name: "Internal Flash  "
+Device disconnects, erases flash and resets now
+```
+
+Subsequently you can grab the contents of flash, and see that it is cleared (all
+0xff):
+
+```
+$ dfu-util --device 0483:df11 --alt 0 --upload cleaned_flash
+dfu-util 0.8
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to dfu-util@lists.gnumonks.org
+
+Deducing device DFU version from functional descriptor length
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #0 ...
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 2048
+Limiting default upload to 16384 bytes
+Upload  [=========================] 100%        16384 bytes
+Upload done.
+```
