@@ -1,3 +1,0 @@
-[submodule "md380-bootloader"]
-	path = md380-bootloader
-	url = https://github.com/pchickey/md380-bootloader
