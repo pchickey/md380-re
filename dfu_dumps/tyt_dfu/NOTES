@@ -1,0 +1,4 @@
+these are the results of using dfu-util 0.8 against TYTs usb dfu software.
+
+it would read 1024 bytes from the first page of flash forever.
+travis goodspeed has a fairly thorough treatment of this in his draft paper.
