@@ -12,5 +12,5 @@ PIN 72 - SWDIO - Test Pad
 PIN 76 - SWCLK - Test Pad
 PIN 94 - BOOT0 - Test Pad
 
-PIN 97 - PC7 - Green LED
-PIN 98 - PC8 - Red LED
+PIN 97 - PE0 - Green LED
+PIN 98 - PE1 - Red LED
