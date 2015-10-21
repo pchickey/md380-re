@@ -26,7 +26,7 @@ def change_extension(f, e):
     return base + "." + e
 
 class C_library(object):
-    def __init__(self, path, sources=None, dependencies=None, extra_includes=None, extra_cflags=None):
+    def __init__(self, path, sources=None, dependencies=None, extra_cflags=None):
         self.path = path
         if sources:
             self.sources = as_list(sources)
@@ -38,43 +38,55 @@ class C_library(object):
         else:
             self.dependencies = []
 
-        if extra_includes:
-            self.extra_includes = as_list(extra_includes)
-        else:
-            self.extra_includes = []
-
         if extra_cflags:
             self.extra_cflags = as_list(extra_cflags)
         else:
             self.extra_cflags = []
+
+    def collect_dependencies(self):
+        ds = self.dependencies;
+        for d in ds:
+            ds += d.dependencies
+        return ds
 
     def local(self, p):
         return self.path + "/" + p
 
     def include_path(self):
         ownpath = [ "-I./" + self.path ]
-        extrapath = [ "-I./" + p for p in self.extra_includes ]
-        deppath =  [ d.include_path for d in self.dependencies ]
-        return ownpath + extrapath + deppath
+        deppath = []
+        for d in self.collect_dependencies():
+            deppath += d.include_path()
+        return ownpath + deppath
 
 
     def build(self, n):
-        dep_paths = [ d.include_path for d in self.dependencies ]
+        dep_paths = [ d.include_path() for d in self.collect_dependencies() ]
         for s in self.sources:
-            vs = { "includes": self.include_path(),
-                    "cflags": "$cflags " + " ".join(self.extra_cflags) }
+            vs = dict({ "includes": " ".join(self.include_path()),
+                        "cflags": "$cflags " + " ".join(self.extra_cflags) })
             n.build(self.local(change_extension(s, "o")),
                     "compile",
                     inputs=self.local(s),
                     variables = vs)
 
-    def outputs(self):
-        return [ self.local(change_extension(s, "o")) for s in self.sources ]
+    def outputs(self, recursive = False):
+        os = [ self.local(change_extension(s, "o")) for s in self.sources ]
+        if recursive:
+            for d in self.dependencies:
+                os += d.outputs()
+        return os
 
 
 #########
 
-class BareMetalApp(object):
+bare_metal_lib = C_library("bare_metal_build",
+                          sources=[ "system_stm32f4xx.c",
+                                    "startup_stm32f4xx.s",
+                                    "syscalls.c" ],
+                          extra_cflags="-DHSE_VALUE=8000000")
+
+class STM32F4App(object):
     def __init__(self, name, path=None, sources=None, dependencies=None):
         self.name = name
         if path:
@@ -90,28 +102,23 @@ class BareMetalApp(object):
         else:
             self.dependencies = []
 
-    def bare_metal_lib(self):
-        return C_library("bare_metal_build",
-                sources=[ "system_stm32f4xx.c",
-                          "startup_stm32f4xx.s",
-                          "syscalls.c" ],
-                extra_includes="bare_metal_build/include",
-                extra_cflags="-DHSE_VALUE=8000000"
-                )
-
     def linker_script(self):
         return "bare_metal_build/stm32f405_flash.lds"
 
     def local(self, p):
         return self.path + "/" + p
 
+    def collect_dependencies(self):
+        ds = self.dependencies;
+        for d in ds:
+            ds += d.dependencies
+        return ds
+
     def build(self, n):
-        bmlib = self.bare_metal_lib()
-        bmlib.build(n)
 
         dep_outputs = []
         dep_includes = []
-        for d in self.dependencies:
+        for d in self.collect_dependencies():
             d.build(n)
             dep_outputs += d.outputs()
             dep_includes += d.include_path()
@@ -127,21 +134,21 @@ class BareMetalApp(object):
         n.build(self.local(self.name + ".elf"),
                 "link",
                 inputs= [ self.local(change_extension(s,"o")) for s in self.sources ]
-                      + dep_outputs
-                      + bmlib.outputs(),
+                      + dep_outputs,
                 variables= {"linkerscript": self.linker_script() })
 
         n.build(self.local(self.name + ".bin"),
                 "binary",
                 inputs=self.local(self.name + ".elf"))
 
+#######
+
 
 with open("build.ninja", "w") as buildfile:
     no_os_hwf4 = C_library("hwf4",
                     sources=[ "rcc.c", "gpio.c"],
-                    extra_includes="bare_metal_build")
-
-    blink = BareMetalApp("blink", sources="blink.c", dependencies=no_os_hwf4)
+                    dependencies=bare_metal_lib)
+    blink = STM32F4App("blink", sources="blink.c", dependencies=no_os_hwf4)
 
     ninja = Writer(buildfile)
 
