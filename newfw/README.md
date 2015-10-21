@@ -13,7 +13,8 @@ $ ninja
 ```
 
 This is the first time I've used the [Ninja Build System][ninja]. So far I like
-it but there are sure to be things that are not very likable.
+it but there are sure to be ways that I've used it which are not super great so
+far. I will eventaully work something out so there are not two steps to build.
 
 ## Applications
 
