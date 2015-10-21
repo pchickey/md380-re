@@ -57,3 +57,5 @@ autopilot.  Many of these depend on FreeRTOS. Currently, only the tiny subset
 that do not depend on the OS (RCC and GPIO) will actually build. The rest of
 them will be brought up shortly.
 
+
+[ninja]: https://martine.github.io/ninja/
