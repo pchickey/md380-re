@@ -4,7 +4,7 @@ from os.path import splitext
 from ninja_syntax import Writer, as_list
 
 def basic_rules(n):
-    n.variable("cflags", "-g3 -Wall -std=gnu99 -mlittle-endian -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+    n.variable("cflags", "-g3 -Wall -std=gnu99 -Os -mlittle-endian -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 
     n.variable("ldflags", "-mlittle-endian -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 
@@ -43,6 +43,8 @@ class C_library(object):
         else:
             self.extra_cflags = []
 
+        self.built = False
+
     def collect_dependencies(self):
         ds = self.dependencies;
         for d in ds:
@@ -60,15 +62,23 @@ class C_library(object):
         return ownpath + deppath
 
 
+    def cflags(self):
+        cf = self.extra_cflags
+        for d in self.collect_dependencies():
+            cf += d.extra_cflags
+        return cf
+
     def build(self, n):
+        if self.built: return
         dep_paths = [ d.include_path() for d in self.collect_dependencies() ]
         for s in self.sources:
             vs = dict({ "includes": " ".join(self.include_path()),
-                        "cflags": "$cflags " + " ".join(self.extra_cflags) })
+                        "cflags": "$cflags " + " ".join(self.cflags()) })
             n.build(self.local(change_extension(s, "o")),
                     "compile",
                     inputs=self.local(s),
                     variables = vs)
+        self.built = True
 
     def outputs(self, recursive = False):
         os = [ self.local(change_extension(s, "o")) for s in self.sources ]
@@ -80,11 +90,11 @@ class C_library(object):
 
 #########
 
-bare_metal_lib = C_library("bare_metal_build",
-                          sources=[ "system_stm32f4xx.c",
-                                    "startup_stm32f4xx.s",
-                                    "syscalls.c" ],
-                          extra_cflags="-DHSE_VALUE=8000000")
+boot_lib = C_library("boot",
+                     sources=[ "system_stm32f4xx.c",
+                               "startup_stm32f4xx.s",
+                               "syscalls.c" ],
+                     extra_cflags="-DHSE_VALUE=8000000")
 
 class STM32F4App(object):
     def __init__(self, name, path=None, sources=None, dependencies=None):
@@ -103,7 +113,7 @@ class STM32F4App(object):
             self.dependencies = []
 
     def linker_script(self):
-        return "bare_metal_build/stm32f405_flash.lds"
+        return "boot/stm32f405_flash.lds"
 
     def local(self, p):
         return self.path + "/" + p
@@ -118,18 +128,22 @@ class STM32F4App(object):
 
         dep_outputs = []
         dep_includes = []
+        dep_cflags   = []
         for d in self.collect_dependencies():
             d.build(n)
             dep_outputs += d.outputs()
             dep_includes += d.include_path()
+            dep_cflags += d.cflags()
 
         includes = " ".join([("-I./" + self.path)] + dep_includes)
+        cflags   = " ".join(dep_cflags)
 
         for s in self.sources:
             n.build(self.local(change_extension(s,"o")),
                     "compile",
                     inputs=self.local(s),
-                    variables={"includes":includes})
+                    variables={"includes":includes,
+                               "cflags": "$cflags " + cflags })
 
         n.build(self.local(self.name + ".elf"),
                 "link",
@@ -143,16 +157,33 @@ class STM32F4App(object):
 
 #######
 
+freertos_lib = C_library(path="freertos/FreeRTOSV8.2.0/Source",
+    sources=["tasks.c", "queue.c", "list.c",
+             "portable/GCC/ARM_CM4F/port.c",
+             "portable/MemMang/heap_1.c"
+             ],
+    extra_cflags="-I./freertos/FreeRTOSV8.2.0/Source/include " +
+                 "-I./freertos/FreeRTOSV8.2.0/Source/portable/GCC/ARM_CM4F " +
+                 "-I./freertos/")
+
+# TODO: freertos as a lib compiles to object files
+# need to add it as a dependency to the build:
+# - make a blink app that depends on vTaskDelayUntil
+# - bring in the rest of hwf4
+
+#######
 
 with open("build.ninja", "w") as buildfile:
     no_os_hwf4 = C_library("hwf4",
                     sources=[ "rcc.c", "gpio.c"],
-                    dependencies=bare_metal_lib)
+                    dependencies=boot_lib)
     blink = STM32F4App("blink", sources="blink.c", dependencies=no_os_hwf4)
 
+    blink2 = STM32F4App("blink2", sources="blink.c",
+                    dependencies=[no_os_hwf4, freertos_lib])
+
     ninja = Writer(buildfile)
-
     basic_rules(ninja)
+
     blink.build(ninja)
-
-
+    blink2.build(ninja)
