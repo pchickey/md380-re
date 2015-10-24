@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from os.path import splitext
+from os import system
 from ninja_syntax import Writer, as_list
 
 def basic_rules(n):
@@ -174,16 +175,30 @@ freertos_lib = C_library(path="freertos/FreeRTOSV8.2.0/Source",
 #######
 
 with open("build.ninja", "w") as buildfile:
-    no_os_hwf4 = C_library("hwf4",
-                    sources=[ "rcc.c", "gpio.c"],
-                    dependencies=boot_lib)
-    blink = STM32F4App("blink", sources="blink.c", dependencies=no_os_hwf4)
+
+    blink = STM32F4App("blink",
+            sources=["blink.c", "rcc.c", "gpio.c"],
+            dependencies=boot_lib)
+
+    md380hw_lib = C_library("md380hw",
+                    sources=[ "eeprom.c",
+                        "fault.c",
+                        "gpio.c",
+                        "i2c.c",
+                        "interrupt.c",
+                        "led.c",
+                        "rcc.c",
+                        "spi.c",
+                        "usart.c"],
+                    dependencies=[boot_lib, freertos_lib])
 
     blink2 = STM32F4App("blink2", sources="blink.c",
-                    dependencies=[no_os_hwf4, freertos_lib])
+                    dependencies=[md380hw_lib])
 
     ninja = Writer(buildfile)
     basic_rules(ninja)
 
     blink.build(ninja)
     blink2.build(ninja)
+
+system("ninja")
