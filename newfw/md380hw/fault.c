@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include <stm32f4xx.h>
+#include "led.h"
 
 void fault_get_regs(uint32_t *sp)
 {
@@ -56,4 +57,35 @@ void HardFault_Handler(void)
     "bx r2\n"
     "handler2_address_const: .word fault_get_regs\n"
     );
+}
+
+
+static void spin_sleep(uint32_t ms) {
+	for (uint32_t i = 0; i < ms; i++) {
+		/* At 168MHz sysclock, and -Os, this loop will take 4 instructions.
+		 * Confirmed with measurement. */
+		for (uint32_t j = 0; j < 168000; j += 4) {
+			asm volatile ("mov r0,r0");
+		}
+	}
+}
+
+
+static void panic(void) {
+	led_setup();
+	green_led(0);
+	for(;;){
+		red_led(1);
+		spin_sleep(200);
+		red_led(0);
+		spin_sleep(200);
+	}
+}
+
+void vApplicationStackOverflowHook(void) {
+	panic();
+}
+
+void vApplicationMallocFailedHook(void) {
+	panic();
 }

@@ -16,10 +16,10 @@
 #include <queue.h>
 #include <task.h>
 
-#include "hwf4/interrupt.h"
-#include "hwf4/rcc.h"
-#include "hwf4/gpio.h"
-#include "hwf4/usart.h"
+#include "interrupt.h"
+#include "rcc.h"
+#include "gpio.h"
+#include "usart.h"
 
 #define BUFFER_SIZE     128
 
