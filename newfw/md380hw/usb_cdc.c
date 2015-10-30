@@ -17,14 +17,14 @@
 
 #include <FreeRTOS.h>
 
-#include <hwf4/usb_cdc.h>
+#include "usb_cdc.h"
 
-#include <usb/usb_conf.h>
-#include <usb/usb_dcd_int.h>
-#include <usb/usbd_cdc_core.h>
-#include <usb/usbd_usr.h>
-#include <usb/usbd_desc.h>
-#include <usb/usbd_cdc_vcp.h>
+#include "usb/usb_conf.h"
+#include "usb/usb_dcd_int.h"
+#include "usb/usbd_cdc_core.h"
+#include "usb/usbd_usr.h"
+#include "usb/usbd_desc.h"
+#include "usb/usbd_cdc_vcp.h"
 
 /** USB device handle initialized in "usb_cdc_init". */
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE g_usb_dev __ALIGN_END;
