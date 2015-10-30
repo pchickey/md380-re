@@ -1,8 +1,10 @@
 
 #include <stdint.h>
+#include <string.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "led.h"
+#include "usb_cdc.h"
 
 static void sleep(uint32_t);
 
@@ -14,27 +16,40 @@ int main (void) {
 	for(;;);
 }
 
+static void led_set(int red, int green) {
+	red_led(red);
+	green_led(green);
+
+	const char red_on[] = "red on,  ";
+	const char red_off[] = "red off, ";
+	const char green_on[] = "green on\n";
+	const char green_off[] = "green off\n";
+	#define SEND_STR(s) usb_cdc_write((void*)(s), strlen(s))
+	SEND_STR(red?red_on:red_off);
+	SEND_STR(green?green_on:green_off);
+	#undef SEND_STR
+}
+
 static void blink_main(void* machtnichts) {
 
 	led_setup();
+	usb_cdc_init();
 
 	for(;;) {
 
-		red_led(1);
-		green_led(1);
+		led_set(1,1);
 
 		sleep(500);
 
-		red_led(0);
-		green_led(0);
+		led_set(0,0);
 
 		sleep(500);
 
-		red_led(1);
+		led_set(1,0);
 
 		sleep(500);
 
-		red_led(0);
+		led_set(0,0);
 
 		sleep(500);
 	}
