@@ -68,6 +68,10 @@ below.
 
 LCD connector is a 20 pin ribbon cable. These signals are indicated as LCDn.
 
+Keypad resistor names are assigned pretty arbitrarily:
+
+![Keypad Resistors](keypad resistor names.jpg)
+
 PIN 1 - GND
 
 PIN 2 - GND
