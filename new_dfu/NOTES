@@ -1,0 +1,21 @@
+
+Travis Goodspeed has prepared a bootloader for the MD380 that is compatible with
+the factory bootloader, but does not lock out reading the device memory via the
+STM32 ROM DFU. This means you can run whatever custom code you want on the
+MD380, while still restoring it to the manufacturer's software. It also means
+you can inspect the manufacturer's software while it is loaded on the device!
+
+To flash the MD380 with the jailbreak bootloader you must first solder on a wire
+to test pads to pull BOOT0 to VDD, boot into the STM32 ROM DFU, and do the
+following to erase everything from the chip:
+
+```
+touch emptyflash
+dfu-util --device 0483:df11 --alt 0 --dfuse-address 0:force:mass-erase:unprotect --download emptyflash
+```
+
+Then, reset the device, and upload the jailbreak bootloader.
+
+```
+dfu-util --device 0483:df11 --alt 0 --dfuse-address 0x08000000 --download jailbreak.bin --reset
+```
