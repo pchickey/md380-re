@@ -59,6 +59,27 @@ PIN 62 - PD15 - Keypad R7
 PIN 63 - PC6 - LCD Backlight Enable
 
 
+### C5000
+
+#### C5000 "V" (Vocoder) Bus (SPI1 in datasheet)
+
+PIN 77 - PA15 - STM32 SPI3\_NSS - C5000 V\_CS
+
+PIN 78 - PC10 - STM32 SPI3\_SCK - C5000 V\_SCLK
+
+PIN 79 - PC11 - STM32 SPI3\_MISO - C5000 SPI0 V\_SDO
+
+PIN 80 - PC12 - STM32 SPI3\_MOSI - C5000 SPI0 V\_SDI
+
+#### C5000 "U" (Configuration) Bus (SPI0 in datasheet). Bit bannged on STM32
+
+PIN 2 - PE3 - STM32 Bitbang CS - C5000 U\_CS
+
+PIN 3 - PE4 - STM32 Bitbang MISO - C5000 U\_SDO
+
+PIN 5 - PE6 - STM32 Bitbang MOSI - C5000 U\_SDI
+
+
 
 ## LCD/Button Board
 
@@ -119,4 +140,7 @@ PIN 22 - Keypad R3
 PIN 23 - Keypad R6
 
 PIN 24 - GND
+
+
+
 
