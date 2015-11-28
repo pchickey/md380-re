@@ -25,23 +25,43 @@ the top level. Applications will build binaries in their directory named
 
 ### Blink
 
-A proof of concept `blink` application that will blink the red and green leds on
-the radio. Red LED will blink at 1hz, Green LED will blink in sync with the red
-LED every other cycle.
+A proof of concept `blink_baremetal` application that will blink the red and
+green leds on the radio. Red LED will blink at 1hz, Green LED will blink in sync
+with the red LED every other cycle.
 
-The blink application source is found in `blink/blink.c`.
+The blink application source is found in `blink_baremetal/blink.c`.
 
 This application must be loaded into the root of the STM32 flash using the STM32
-ROM DFU or the SWD interface.
+ROM DFU or the SWD interface, at address 0x08000000.
 
 This application runs directly on the STM32 - no operating system is used, and
 no peripherals are used besides the GPIO pins.
 
-### Blink2
+### Blink BL
+
+A proof of concept `blink_bootloader` application that will blink the red and
+green leds four times, then jump to a loaded radio "application". This is the
+starting point for porting in a proper bootloader so we can replace the factory
+bootloader.
+
+The blink application source is found in `blink_bl/blink.c`.
+
+This application must be loaded into the root of the STM32 flash using the STM32
+ROM DFU or the SWD interface, at address 0x80000000.
+
+This application runs directly on the STM32 - no operating system is used, and
+no peripherals are used besides the GPIO pins.
+
+### Blink USB OS
 
 A port of the `blink` application to FreeRTOS, using the FreeRTOS scheduler to
 sleep instead of spinning. Demonstrates that FreeRTOS is working properly, and
-md380hw links properly. No other functionality.
+md380hw links properly. It will also create a USB CDC (virtual serial port)
+device, to which it will print the state of the LED.
+
+This application must be loaded into the root of the STM32 flash using the STM32
+ROM DFU or the SWD interface, at address 0x8000c000. Use the "Blink BL"
+application as a bootloader.
 
 ## Libraries
 

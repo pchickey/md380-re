@@ -122,7 +122,7 @@ class STM32F4App(object):
             self.dependencies = []
 
     def linker_script(self):
-        return "boot/stm32f405_flash.lds"
+        return "boot/stm32f405_flash_app.lds"
 
     def local(self, p):
         return self.path + "/" + p
@@ -164,3 +164,6 @@ class STM32F4App(object):
                 "binary",
                 inputs=self.local(self.name + ".elf"))
 
+class STM32F4Bootloader(STM32F4App):
+    def linker_script(self):
+        return "boot/stm32f405_flash_bl.lds"
