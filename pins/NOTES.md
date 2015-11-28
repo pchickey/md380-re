@@ -48,6 +48,12 @@ board. Use these pins as regular push-pull outputs to drive the transistor gate.
 
 ### LCD / Buttons
 
+PIN 40 - PE9 - Top Side Button
+
+PIN 41 - PE10 - Monitor Button
+
+PIN 42 - PE11 - PTT Button
+
 PIN 59 - PD12 - LCD18
 
 PIN 60 - PD13 - LCD12
