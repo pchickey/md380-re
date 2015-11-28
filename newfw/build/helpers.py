@@ -17,6 +17,8 @@ def basic_rules(n):
 
     n.variable("ldflags", "-mlittle-endian -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 
+    n.variable("ldflags", "$ldflags -fno-builtin -nostartfiles")
+
     n.rule("compile",
             command="arm-none-eabi-gcc $cflags $includes -c $in -o $out",
             description="CC $out")
@@ -101,8 +103,7 @@ class C_library(object):
 
 boot_lib = C_library("boot",
                      sources=[ "system_stm32f4xx.c",
-                               "startup_stm32f4xx.s",
-                               "syscalls.c" ],
+                               "startup_stm32f4xx.s"],
                      extra_cflags="-DHSE_VALUE=8000000")
 
 class STM32F4App(object):

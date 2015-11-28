@@ -354,7 +354,6 @@ extern uint32_t _sbss;
 extern uint32_t _ebss;
 
 extern void main(void);
-extern void __libc_init_array(void);
 
 __attribute__((section(".text.Reset_Handler")))
 void Reset_Handler(void) {
@@ -380,9 +379,6 @@ void Reset_Handler(void) {
 
     /* Low level Initialize */
     SystemInit() ;
-
-    /* Initialize the C library */
-    __libc_init_array() ;
 
     /* Branch to main function */
     main() ;
