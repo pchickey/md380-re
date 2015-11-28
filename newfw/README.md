@@ -23,7 +23,7 @@ By convention, application and library sources all get their own directory below
 the top level. Applications will build binaries in their directory named
 `$app.elf` and `$app.bin`.
 
-### Blink
+### Blink Baremetal
 
 A proof of concept `blink_baremetal` application that will blink the red and
 green leds on the radio. Red LED will blink at 1hz, Green LED will blink in sync
@@ -37,9 +37,9 @@ ROM DFU or the SWD interface, at address 0x08000000.
 This application runs directly on the STM32 - no operating system is used, and
 no peripherals are used besides the GPIO pins.
 
-### Blink BL
+### Blink Bootloader
 
-A proof of concept `blink_bootloader` application that will blink the red and
+A proof of concept `blink_bl` application that will blink the red and
 green leds four times, then jump to a loaded radio "application". This is the
 starting point for porting in a proper bootloader so we can replace the factory
 bootloader.
@@ -54,14 +54,22 @@ no peripherals are used besides the GPIO pins.
 
 ### Blink USB OS
 
-A port of the `blink` application to FreeRTOS, using the FreeRTOS scheduler to
-sleep instead of spinning. Demonstrates that FreeRTOS is working properly, and
-md380hw links properly. It will also create a USB CDC (virtual serial port)
-device, to which it will print the state of the LED.
+An application using the FreeRTOS scheduler for timing (task delay instead of
+spinning) and inter process communication. Demonstrates that FreeRTOS is working
+properly, and some features of md380hw work properly. It will also create a USB
+CDC (virtual serial port) device, to which it will print the state of the LED.
+
+The Red LED will blink on and off every 500ms. The Green LED is controlled
+by the PTT button.
 
 This application must be loaded into the root of the STM32 flash using the STM32
 ROM DFU or the SWD interface, at address 0x8000c000. Use the "Blink BL"
 application as a bootloader.
+
+### PX4 Bootloader
+
+A port of the [PX4 Project](http://pixhawk.org)'s bootloader into this build
+tree. Leaves out some unnecessary functionality from the PX4 Bootloader.
 
 ## Libraries
 
