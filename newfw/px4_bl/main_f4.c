@@ -181,11 +181,17 @@ board_init(void)
 	/* fix up the max firmware size, we have to read memory to get this */
 	board_info.fw_size = APP_SIZE_MAX,
 
+#ifndef INTERFACE_USB_NO_VBUS
 #ifdef INTERFACE_USB
 	/* enable GPIO9 with a pulldown to sniff VBUS */
 	rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_IOPAEN);
 	gpio_mode_setup(GPIOA, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN, GPIO9);
 #endif
+#else
+	rcc_peripheral_enable_clock(&BOARD_FORCE_BL_CLOCK_REGISTER, BOARD_FORCE_BL_CLOCK_BIT);
+	gpio_mode_setup(BOARD_FORCE_BL_PORT, GPIO_MODE_INPUT, BOARD_FORCE_BL_PULL, BOARD_FORCE_BL_PIN);
+#endif
+
 
 	/* initialise LEDs */
 	rcc_peripheral_enable_clock(&RCC_AHB1ENR, BOARD_CLOCK_LEDS);
@@ -377,6 +383,7 @@ main(void)
         }
 #endif
 
+#ifndef INTERFACE_USB_NO_VBUS
 #ifdef INTERFACE_USB
 	/*
 	 * Check for USB connection - if present, don't try to boot, but set a timeout after
@@ -390,6 +397,13 @@ main(void)
 		/* don't try booting before we set up the bootloader */
 		try_boot = false;
 	}
+#endif
+#else
+
+	if (gpio_get(BOARD_FORCE_BL_PORT, BOARD_FORCE_BL_PIN) == BOARD_FORCE_BL_STATE) {
+		try_boot = false;
+	}
+
 #endif
 
 	/* Try to boot the app if we think we should just go straight there */
