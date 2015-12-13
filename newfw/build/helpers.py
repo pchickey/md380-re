@@ -168,3 +168,7 @@ class STM32F4App(object):
 class STM32F4Bootloader(STM32F4App):
     def linker_script(self):
         return "boot/stm32f405_flash_bl.lds"
+
+class MD380SideloadApp(STM32F4App):
+    def linker_script(self):
+        return "boot/md380sideload.lds"

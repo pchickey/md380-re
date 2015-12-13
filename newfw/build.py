@@ -48,6 +48,10 @@ blink_usb_os = STM32F4App("blink_usb_os",
     sources="blink.c",
     dependencies=[md380hw_lib])
 
+blink_sideload= MD380SideloadApp("blink_sideload",
+    sources="blink.c",
+    dependencies=[md380hw_lib])
+
 
 class LibOpenCM3(object):
     def __init__(self, path):
@@ -89,4 +93,4 @@ px4_bl = LibOpenCM3Bootloader("px4_bl",
     dependencies=[libopencm3])
 
 
-ninja_build([ blink_baremetal, blink_bl, blink_usb_os, px4_bl ])
+ninja_build([ blink_baremetal, blink_bl, blink_usb_os, blink_sideload, px4_bl ])
