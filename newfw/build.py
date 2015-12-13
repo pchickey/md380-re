@@ -93,4 +93,4 @@ px4_bl = LibOpenCM3Bootloader("px4_bl",
     dependencies=[libopencm3])
 
 
-ninja_build([ blink_baremetal, blink_bl, blink_usb_os, blink_sideload, px4_bl ])
+ninja_build([ blink_baremetal, blink_bl, blink_usb_os, blink_sideload ])
