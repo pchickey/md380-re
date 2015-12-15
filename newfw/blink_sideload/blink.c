@@ -18,13 +18,14 @@ static void red_main(void*);
 static SemaphoreHandle_t red_monitor;
 
 
-static void attempt_sideload(void);
+static void abort_to_mfgr_app(void);
 
 int main (void) {
-	input_setup(pin_e10);
-	int mon = !pin_read(pin_e10);
-	if (mon) {
-		attempt_sideload();
+
+	// Check for sideloading
+	input_setup(pin_e11);
+	if (pin_read(pin_e11)) {
+		abort_to_mfgr_app();
 	}
 
 	red_monitor = xSemaphoreCreateMutex();
@@ -105,17 +106,8 @@ static void do_jump(uint32_t stacktop, uint32_t entrypoint);
 #define SIDELOAD_RESET_VECTOR     8
 #define SIDELOAD_APP_LOAD_ADDRESS 0x0809D000
 
-static void attempt_sideload(void) {
+static void abort_to_mfgr_app(void) {
 	const uint32_t *app_base = (const uint32_t *)MFGR_APP_LOAD_ADDRESS;
-	if (app_base[SIDELOAD_RESET_VECTOR] < MFGR_APP_LOAD_ADDRESS)
-		return;
-	if (app_base[SIDELOAD_RESET_VECTOR] >= SIDELOAD_APP_LOAD_ADDRESS)
-		return;
-
-	led_setup();
-	red_led(1);
-	green_led(0);
-
 	SCB->VTOR = MFGR_APP_LOAD_ADDRESS;
 	do_jump(app_base[0], app_base[SIDELOAD_RESET_VECTOR]);
 }
