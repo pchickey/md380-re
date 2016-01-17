@@ -52,45 +52,4 @@ blink_sideload= MD380SideloadApp("blink_sideload",
     sources="blink.c",
     dependencies=[md380hw_lib])
 
-
-class LibOpenCM3(object):
-    def __init__(self, path):
-        self.name = "libopencm3"
-        self.path = path
-        self.dependencies = []
-
-    def collect_dependencies(self):
-        return self.dependencies
-
-    def include_path(self):
-        ownpath = ["-I" + self.path + "/include"]
-        deppath = []
-        for d in self.collect_dependencies():
-            deppath += d.include_path()
-        return ownpath + deppath
-
-
-    def cflags(self):
-        return ["-DSTM32F4"]
-
-    def build(self, n):
-        # XXX put logic here to make -C {self.path} lib
-        pass
-
-    def outputs(self, recursive = False):
-        return [ self.path + "/lib/libopencm3_stm32f4.a" ]
-
-libopencm3 = LibOpenCM3("./libopencm3")
-
-class LibOpenCM3Bootloader(STM32F4Bootloader):
-    def linker_script(self):
-        return "px4_bl/stm32f4.ld"
-
-px4_bl = LibOpenCM3Bootloader("px4_bl",
-    sources=[ "main_f4.c",
-              "bl.c",
-              "cdcacm.c"],
-    dependencies=[libopencm3])
-
-
 ninja_build([ blink_baremetal, blink_bl, blink_usb_os, blink_sideload ])
