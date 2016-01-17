@@ -1,0 +1,3 @@
+[submodule "md380tools"]
+	path = md380tools
+	url = https://github.com/travisgoodspeed/md380tools
