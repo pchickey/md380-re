@@ -57,7 +57,7 @@ MEMORY
 }
 
 /* Top of the user mode stack. */
-_estack = 0x20020000;           /* top of 128KiB of SRAM */
+_estack = 0x2001fffc;           /* top of 128KiB of SRAM */
 
 /* Error in the linker if heap and stack don't fit. */
 _min_heap_size = 0;
